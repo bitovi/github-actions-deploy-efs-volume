@@ -54,6 +54,7 @@ inputs:
   aws_efs_create: 
     description: 'Toggle to indicate whether to create and EFS and mount it to the ec2 as a part of the provisioning. Note: The EFS will be managed by the stack and will be destroyed along with the stack.'
     required: false
+    default: true
   aws_efs_fs_id: 
     description: 'ID of existing EFS'
     required: false
