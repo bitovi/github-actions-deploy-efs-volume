@@ -159,7 +159,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@71-
+      uses: bitovi/github-actions-commons@71-efs-existing-mount-points-error
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
