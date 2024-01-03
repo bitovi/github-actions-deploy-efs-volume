@@ -169,7 +169,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@main
+      uses: bitovi/github-actions-commons@debugging-vpc-az-issue
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
