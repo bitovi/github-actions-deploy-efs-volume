@@ -157,17 +157,17 @@ The following inputs can be used as `step.with` keys
 #### **Outputs**
 | Name             | Description                        |
 |------------------|------------------------------------|
-| `aws_efs_fs_id` | Aurora Endpoint. |
-| `aws_efs_fs_id` | AWS Secret name containing db credentials. |
-| `aws_efs_fs_id` | SG ID for the Aurora instance. |
+| `aws_efs_fs_id` | AWS EFS FS ID of the volume. |
+| `aws_efs_replica_fs_id` | AWS EFS FS ID of the replica volume. |
+| `aws_efs_sg_id` | SG ID for the EFS Volume. |
 | `aws_vpc_id` | VPC ID if a VPC was created. |
 <br/>
 
 ## Contributing
-We would love for you to contribute to [`bitovi/github-actions-deploy-aurora`](hhttps://github.com/bitovi/github-actions-deploy-aurora).   [Issues](https://github.com/bitovi/github-actions-deploy-aurora/issues) and [Pull Requests](https://github.com/bitovi/github-actions-deploy-aurora/pulls) are welcome!
+We would love for you to contribute to [`bitovi/github-actions-deploy-efs-volume`](hhttps://github.com/bitovi/github-actions-deploy-efs-volume).   [Issues](https://github.com/bitovi/github-actions-deploy-efs-volume/issues) and [Pull Requests](https://github.com/bitovi/github-actions-deploy-efs-volume/pulls) are welcome!
 
 ## License
-The scripts and documentation in this project are released under the [MIT License](https://github.com/bitovi/github-actions-deploy-aurora/blob/main/LICENSE).
+The scripts and documentation in this project are released under the [MIT License](https://github.com/bitovi/github-actions-deploy-efs-volume/blob/main/LICENSE).
 
 # Provided by Bitovi
 [Bitovi](https://www.bitovi.com/) is a proud supporter of Open Source software.
