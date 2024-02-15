@@ -84,7 +84,7 @@ jobs:
 1. [VPC Inputs](#vpc-inputs)
 
 ### Outputs
-1. [Outputs](#outputs)
+1. [Action Outputs](#action-outputs)
 
 The following inputs can be used as `step.with` keys
 <br/>
@@ -154,7 +154,7 @@ The following inputs can be used as `step.with` keys
 | `aws_vpc_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to vpc provisioned resources.|
 <br/>
 
-#### **Outputs**
+#### **Action Outputs**
 | Name             | Description                        |
 |------------------|------------------------------------|
 | `aws_efs_fs_id` | AWS EFS FS ID of the volume. |
