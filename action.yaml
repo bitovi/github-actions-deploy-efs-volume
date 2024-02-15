@@ -1,0 +1,224 @@
+name: 'Deploy Amazon EFS volume'
+description: 'Deploys an AWS EFS volume'
+branding:
+  icon: upload-cloud
+  color: red
+inputs:
+  bitops_code_only:
+    description: 'Will run only the generation phase of BitOps, where the Terraform and Ansible code is built.'
+    required: false
+  bitops_code_store:
+    description: 'Store BitOps code as a GitHub artifact'
+    required: false
+    default: false
+
+  # AWS
+  aws_access_key_id:
+    description: 'AWS access key ID'
+    required: true
+  aws_secret_access_key:
+    description: 'AWS secret access key'
+    required: true
+  aws_session_token:
+    description: 'AWS session token'
+    required: false
+  aws_default_region:
+    description: 'AWS default region'
+    required: false
+    default: us-east-1
+  aws_resource_identifier:
+    description: 'Set to override the AWS resource identifier for the deployment.  Defaults to `${org}-{repo}-{branch}`.  Use with destroy to destroy specific resources.'
+    required: false
+  aws_additional_tags:
+    description: 'A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`'
+    required: false
+
+  # Terraform
+  tf_stack_destroy:
+    description: 'Set to "true" to Destroy the stack through Terraform.'
+    required: false
+  tf_state_file_name:
+    description: 'Change this to be anything you want to. Carefull to be consistent here. A missing file could trigger recreation, or stepping over destruction of non-defined objects.'
+    required: false
+  tf_state_file_name_append:
+    description: 'Append a string to the tf-state-file. Setting this to `unique` will generate `tf-state-aws-unique`. Can co-exist with the tf_state_file_name variable. '
+    required: false
+  tf_state_bucket:
+    description: 'AWS S3 bucket to use for Terraform state. Defaults to `${org}-${repo}-{branch}-tf-state`'
+    required: false
+  tf_state_bucket_destroy:
+    description: 'Force purge and deletion of S3 bucket defined. Any file contained there will be destroyed. `tf_stack_destroy` must also be `true`'
+    required: false
+
+  # AWS EFS
+  aws_efs_create: 
+    description: 'Toggle to indicate whether to create and EFS and mount it to the ec2 as a part of the provisioning. Note: The EFS will be managed by the stack and will be destroyed along with the stack.'
+    required: false
+    default: true
+  aws_efs_fs_id: 
+    description: 'ID of existing EFS'
+    required: false
+  aws_efs_create_mount_target: 
+    description: 'Toggle to indicate whether we should create a mount target for the EFS volume. Accepts incoming fs_id with no mount targets too.'
+    required: false
+  aws_efs_create_ha: 
+    description: 'Toggle to indicate whether the EFS resource should be highly available (mount points in all available zones within region).'
+    required: false
+  aws_efs_vol_encrypted: 
+    description: 'Toggle encryption of the EFS volume.'
+    required: false
+  aws_efs_kms_key_id: 
+    description: 'The ARN for the KMS encryption key. Default key will be used if none defined.'
+    required: false
+  aws_efs_performance_mode: 
+    description: 'Toggle perfomance mode. Options are: generalPurpose or maxIO.'
+    required: false
+  aws_efs_throughput_mode: 
+    description: 'Throughput mode for the file system. Defaults to bursting. Valid values: bursting, provisioned, or elastic. When using provisioned, also set provisioned_throughput_in_mibps.'
+    required: false
+  aws_efs_throughput_speed: 
+    description: 'The throughput, measured in MiB/s, that you want to provision for the file system. Only applicable with throughput_mode set to provisioned.'
+    required: false
+  aws_efs_security_group_name: 
+    description: 'The name of the EFS security group. Defaults to SG for aws_resource_identifier - EFS.'
+    required: false
+  aws_efs_allowed_security_groups: 
+    description: 'Comma separated list of security groups to be added to the EFS SG.'
+    required: false
+  aws_efs_ingress_allow_all: 
+    description: 'Allow incoming traffic from 0.0.0.0/0.'
+    required: false
+  aws_efs_create_replica: 
+    description: 'Toggle to indiciate whether a read-only replica should be created for the EFS primary file system'
+    required: false
+  aws_efs_replication_destination: 
+    description: 'AWS Region to target for replication'
+    required: false
+  aws_efs_enable_backup_policy: 
+    description: 'Toggle to indiciate whether the EFS should have a backup policy, default is `false`'
+    required: false
+  aws_efs_transition_to_inactive: 
+    description: 'https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_file_system#transition_to_ia'
+    required: false
+  aws_efs_mount_target: 
+    description: 'Directory path in efs to mount to'
+    required: false
+  aws_efs_ec2_mount_point: 
+    description: 'Directory path in application env to mount directory'
+    required: false
+  aws_efs_additional_tags: 
+    description: 'A list of strings that will be added to created resources'
+    required: false
+
+  # AWS VPC Inputs
+  aws_vpc_create:
+    description: 'Define if a VPC should be created'
+    required: false
+  aws_vpc_name:
+    description: 'Set a specific name for the VPC'
+    required: false
+  aws_vpc_cidr_block:
+    description: 'Define Base CIDR block which is divided into subnet CIDR blocks. Defaults to 10.0.0.0/16.'
+    required: false
+  aws_vpc_public_subnets:
+    description: 'Comma separated list of public subnets. Defaults to 10.10.110.0/24'
+    required: false
+  aws_vpc_private_subnets:
+    description: 'Comma separated list of private subnets. If none, none will be created.'
+    required: false
+  aws_vpc_availability_zones:
+    description: 'Comma separated list of availability zones. Defaults to `aws_default_region.'
+    required: false
+  aws_vpc_id:
+    description: 'AWS VPC ID. Accepts `vpc-###` values.'
+    required: false
+  aws_vpc_subnet_id:
+    description: 'Specify a Subnet to be used with the instance. If none provided, will pick one.'
+    required: false
+  aws_vpc_enable_nat_gateway:
+    description: 'Enables NAT gateway'
+    required: false
+  aws_vpc_single_nat_gateway:
+    description: 'Creates only one NAT gateway'
+    required: false
+  aws_vpc_external_nat_ip_ids:
+    description: 'Comma separated list of IP IDS to reuse in the NAT gateways'
+    required: false
+  aws_vpc_additional_tags:
+    description: 'A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`'
+    required: false
+
+outputs:
+  # EFS
+  aws_efs_fs_id:
+    description: "EFS FS ID"
+    value: ${{ steps.deploy.outputs.aws_efs_fs_id }}
+  aws_efs_replica_fs_id:
+    description: "EFS FS Replica ID"
+    value: ${{ steps.deploy.outputs.aws_efs_replica_fs_id }}
+  aws_efs_sg_id:
+    description: "EFS FS SG ID"
+    value: ${{ steps.deploy.outputs.aws_efs_sg_id }}
+  # VPC
+  aws_vpc_id:
+    description: "The selected VPC ID used."
+    value: ${{ steps.deploy.outputs.aws_vpc_id }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Deploy with BitOps
+      id: deploy
+      uses: bitovi/github-actions-commons@v0.0.13
+      with:
+        # AWS
+        aws_access_key_id: ${{ inputs.aws_access_key_id }}
+        aws_secret_access_key: ${{ inputs.aws_secret_access_key }}
+        aws_session_token: ${{ inputs.aws_session_token }}
+        aws_default_region: ${{ inputs.aws_default_region }}
+        aws_resource_identifier: ${{ inputs.aws_resource_identifier }}
+        aws_additional_tags: ${{ inputs.aws_additional_tags }}
+        
+        # Terraform
+        tf_stack_destroy: ${{ inputs.tf_stack_destroy }}
+        tf_state_file_name: ${{ inputs.tf_state_file_name }}
+        tf_state_file_name_append: ${{ inputs.tf_state_file_name_append }}
+        tf_state_bucket: ${{ inputs.tf_state_bucket }}
+        tf_state_bucket_destroy: ${{ inputs.tf_state_bucket_destroy }}
+        
+        # Current repo vars
+        bitops_code_only: ${{ inputs.bitops_code_only }}
+        bitops_code_store: ${{ inputs.bitops_code_store }}
+
+        # AWS EFS
+        aws_efs_create: ${{ inputs.aws_efs_create }}
+        aws_efs_fs_id: ${{ inputs.aws_efs_fs_id }}
+        aws_efs_create_mount_target: ${{ inputs.aws_efs_create_mount_target }}
+        aws_efs_create_ha: ${{ inputs.aws_efs_create_ha }}
+        aws_efs_vol_encrypted: ${{ inputs.aws_efs_vol_encrypted }}
+        aws_efs_kms_key_id: ${{ inputs.aws_efs_kms_key_id }}
+        aws_efs_performance_mode: ${{ inputs.aws_efs_performance_mode }}
+        aws_efs_throughput_mode: ${{ inputs.aws_efs_throughput_mode }}
+        aws_efs_throughput_speed: ${{ inputs.aws_efs_throughput_speed }}
+        aws_efs_security_group_name: ${{ inputs.aws_efs_security_group_name }}
+        aws_efs_allowed_security_groups: ${{ inputs.aws_efs_allowed_security_groups }}
+        aws_efs_ingress_allow_all: ${{ inputs.aws_efs_ingress_allow_all }}
+        aws_efs_create_replica: ${{ inputs.aws_efs_create_replica }}
+        aws_efs_replication_destination: ${{ inputs.aws_efs_replication_destination }}
+        aws_efs_enable_backup_policy: ${{ inputs.aws_efs_enable_backup_policy }}
+        aws_efs_transition_to_inactive: ${{ inputs.aws_efs_transition_to_inactive }}
+        aws_efs_additional_tags: ${{ inputs.aws_efs_additional_tags }}
+
+        # AWS VPC Inputs
+        aws_vpc_create: ${{ inputs.aws_vpc_create }}
+        aws_vpc_name: ${{ inputs.aws_vpc_name }}
+        aws_vpc_cidr_block: ${{ inputs.aws_vpc_cidr_block }}
+        aws_vpc_public_subnets: ${{ inputs.aws_vpc_public_subnets }}
+        aws_vpc_private_subnets: ${{ inputs.aws_vpc_private_subnets }}
+        aws_vpc_availability_zones: ${{ inputs.aws_vpc_availability_zones }}
+        aws_vpc_id: ${{ inputs.aws_vpc_id }}
+        aws_vpc_subnet_id: ${{ inputs.aws_vpc_subnet_id }}
+        aws_vpc_enable_nat_gateway: ${{ inputs.aws_vpc_enable_nat_gateway }}
+        aws_vpc_single_nat_gateway: ${{ inputs.aws_vpc_single_nat_gateway }}
+        aws_vpc_external_nat_ip_ids: ${{ inputs.aws_vpc_external_nat_ip_ids }}
+        aws_vpc_additional_tags: ${{ inputs.aws_vpc_additional_tags }}
