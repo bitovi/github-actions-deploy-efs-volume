@@ -21,7 +21,7 @@ This project is supported by [Bitovi, A DevOps consultancy](https://www.bitovi.c
 
 You can **get help or ask questions** on our:
 
-- [Discord Community](https://discord.gg/J7ejFsZnJ4Z)
+- [Discord Community](https://discord.gg/zAHn4JBVcX)
 
 Or, you can hire us for training, consulting, or development. [Set up a free consultation](https://www.bitovi.com/services/devops-consulting).
 
@@ -162,6 +162,19 @@ The following inputs can be used as `step.with` keys
 | `aws_efs_sg_id` | SG ID for the EFS Volume. |
 | `aws_vpc_id` | VPC ID if a VPC was created. |
 <br/>
+
+## Note about resource identifiers
+
+Most resources will contain the tag `${GITHUB_ORG_NAME}-${GITHUB_REPO_NAME}-${GITHUB_BRANCH_NAME}`, some of them, even the resource name after. 
+We limit this to a 60 characters string because some AWS resources have a length limit and short it if needed.
+
+We use the kubernetes style for this. For example, kubernetes -> k(# of characters)s -> k8s. And so you might see some compressions are made.
+
+For some specific resources, we have a 32 characters limit. If the identifier length exceeds this number after compression, we remove the middle part and replace it for a hash made up from the string itself. 
+
+### S3 buckets naming
+
+Buckets names can be made of up to 63 characters. If the length allows us to add -tf-state, we will do so. If not, a simple -tf will be added.
 
 ## Contributing
 We would love for you to contribute to [`bitovi/github-actions-deploy-efs-volume`](hhttps://github.com/bitovi/github-actions-deploy-efs-volume).   [Issues](https://github.com/bitovi/github-actions-deploy-efs-volume/issues) and [Pull Requests](https://github.com/bitovi/github-actions-deploy-efs-volume/pulls) are welcome!
